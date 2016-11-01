@@ -15,12 +15,12 @@ class Array_t : public Container_t<T>
 		Array_t(const Array_t& _arr);
 		virtual ~Array_t();
 		const Array_t<T>& operator=(const Array_t& _arr);
-		virtual bool Append(const T& _el, int _index);		
-		virtual bool Prepend(const T& _el, size_t _index);
+		virtual bool Append(const T* _el, size_t _index);		
+		virtual bool Prepend(const T* _el, size_t _index);
 		virtual bool Contains(const T& _el) const;
-		virtual bool Find(const T& _el);
+		virtual const T* Find(const T& _el) const;
 		virtual int Index(const T& _el) const;
-		virtual void Insert(const T& _el);
+		virtual void Insert(const T* _el);
 		virtual bool Remove(const T& _el);
 		virtual void RemoveAll();
 		virtual bool RemoveAndDelete(const T& _el);
@@ -47,6 +47,13 @@ void Array_t<T>::ResizeIfNeed(size_t _newSize)
 }
 
 template <class T>
+Array_t<T>::Array_t(const Array_t& _arr): Container_t<T>(_arr), m_currSize(_arr.m_currSize) 
+{
+	m_elements = new T*[m_currSize];	
+	memcpy(m_elements, _arr.m_elements, sizeof(T*) * _arr.Count());
+}
+
+template <class T>
 Array_t<T>::Array_t():m_currSize(m_defaultInitialSize) 
 {
 	m_elements = new T*[m_defaultInitialSize];
@@ -65,21 +72,24 @@ Array_t<T>::~Array_t()
 template <class T>
 const Array_t<T>& Array_t<T>::operator=(const Array_t<T>& _arr)
 {
-	ResizeIfNeed(_arr.m_currSize);
-	memcpy(m_elements, _arr.m_elements, sizeof(T*) * _arr.Count());
-
+	if(this != &_arr)
+	{
+		Container_t<T>::operator=(_arr);	
+		ResizeIfNeed(_arr.m_currSize);
+		memcpy(m_elements, _arr.m_elements, sizeof(T*) * _arr.Count());
+	}
 	return *this;
 }
 
 template <class T>
-bool Array_t<T>::Append(const T& _el, int _index)
+bool Array_t<T>::Append(const T* _el, size_t _index)
 {
 	if(_index  + 1 <= Container_t<T>::Count())
 	{	
-		size_t newSize = (m_currSize > Container_t<T>::Count() ? m_currSize : m_currSize * 2);
+		size_t newSize = (m_currSize > Container_t<T>::Count() ? m_currSize : m_currSize * 2); 
 		T** newArray = new T*[newSize];
 		memcpy(newArray, m_elements, sizeof(T*) * (_index + 1));
-		newArray[_index + 1] = (int*)&_el;
+		newArray[_index + 1] = (int*)_el;
 		memcpy(newArray+_index + 2, m_elements +_index + 1, sizeof(T*) * (Container_t<T>::Count() - _index - 1));
 		delete[] m_elements;
 		m_elements = newArray;
@@ -94,7 +104,7 @@ bool Array_t<T>::Append(const T& _el, int _index)
 }
 
 template <class T>
-bool Array_t<T>::Prepend(const T& _el, size_t _index)
+bool Array_t<T>::Prepend(const T* _el, size_t _index)
 {
 	return _index > 0 ? Append(_el,_index - 1) : false;
 }
@@ -102,29 +112,20 @@ bool Array_t<T>::Prepend(const T& _el, size_t _index)
 template <class T>
 bool Array_t<T>::Contains(const T& _el) const
 {
-	for (int i = 0, n = Container_t<T>::Count(); i < n; ++i)
-	{
-		if(*m_elements[i] == _el)
-		{
-			return true;
-		}
-	}
-	return false;
+	return (bool)Find(_el);
 }
 
 template <class T>
-bool Array_t<T>::Find(const T& _el) 
+const T* Array_t<T>::Find(const T& _el) const
 {
 	for (int i = 0, n = Container_t<T>::Count(); i < n; ++i)
 	{
 		if(*m_elements[i] == _el)
-		{
-			memcpy(m_elements + i, m_elements + i + 1, sizeof(T*) * (Container_t<T>::Count() - i - 1));	
-			Container_t<T>::DecreaseNumOfElements();		
-			return true;
+		{		
+			return m_elements[i];
 		}
 	}
-	return false;
+	return 0;
 }
 
 template <class T>
@@ -141,7 +142,7 @@ int Array_t<T>::Index(const T& _el) const
 }
 
 template <class T>
-void Array_t<T>::Insert(const T& _el)
+void Array_t<T>::Insert(const T* _el)
 {
 	Append(_el, Container_t<T>::Count() - 1);
 }
@@ -149,7 +150,17 @@ void Array_t<T>::Insert(const T& _el)
 template <class T>
 bool Array_t<T>::Remove(const T& _el)
 {
-	return Find(_el);
+	int index = Index(_el);
+	if(index >= 0)
+	{
+		memcpy(m_elements + index, m_elements + index + 1, sizeof(T*) * (Container_t<T>::Count() - index - 1));
+		Container_t<T>::DecreaseNumOfElements(); 	
+		return true;
+	}		
+	else
+	{
+		return false;
+	}
 }
 
 template <class T>

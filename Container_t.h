@@ -9,13 +9,15 @@ class Container_t
 	public:
 		Container_t():m_numOfElements(0){}
 		virtual ~Container_t() {};
-		virtual bool Append(const T& _el, int _index) = 0;		
-		virtual bool Prepend(const T& _el, size_t _index) = 0;
+		Container_t(const Container_t& _cont): m_numOfElements(_cont.m_numOfElements){}
+		const Container_t<T>& operator=(const Container_t<T>& _arr) { m_numOfElements = _arr.m_numOfElements; return *this; };
+		virtual bool Append(const T* _el, size_t _index) = 0;		
+		virtual bool Prepend(const T* _el, size_t _index) = 0;
 		virtual bool Contains(const T& _el) const = 0;
 		inline size_t Count() const { return m_numOfElements; }
-		virtual bool Find(const T& _el) = 0;
+		virtual const T* Find(const T& _el) const = 0;
 		virtual int Index(const T& _el) const = 0;
-		virtual void Insert(const T& _el) = 0;
+		virtual void Insert(const T* _el) = 0;
 		bool IsEmpty() const { return m_numOfElements == 0; }
 		virtual bool Remove(const T& _el) = 0;
 		virtual void RemoveAll() = 0;
