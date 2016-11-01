@@ -15,7 +15,7 @@ class Array_t : public Container_t<T>
 		Array_t(const Array_t& _arr);
 		virtual ~Array_t();
 		const Array_t<T>& operator=(const Array_t& _arr);
-		virtual bool Append(const T& _el, size_t _index);		
+		virtual bool Append(const T& _el, int _index);		
 		virtual bool Prepend(const T& _el, size_t _index);
 		virtual bool Contains(const T& _el) const;
 		virtual bool Find(const T& _el);
@@ -72,7 +72,7 @@ const Array_t<T>& Array_t<T>::operator=(const Array_t<T>& _arr)
 }
 
 template <class T>
-bool Array_t<T>::Append(const T& _el, size_t _index)
+bool Array_t<T>::Append(const T& _el, int _index)
 {
 	if(_index  + 1 <= Container_t<T>::Count())
 	{	

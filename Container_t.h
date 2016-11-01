@@ -9,7 +9,7 @@ class Container_t
 	public:
 		Container_t():m_numOfElements(0){}
 		virtual ~Container_t() {};
-		virtual bool Append(const T& _el, size_t _index) = 0;		
+		virtual bool Append(const T& _el, int _index) = 0;		
 		virtual bool Prepend(const T& _el, size_t _index) = 0;
 		virtual bool Contains(const T& _el) const = 0;
 		inline size_t Count() const { return m_numOfElements; }
