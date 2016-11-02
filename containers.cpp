@@ -183,7 +183,7 @@ void FindTest()
 	cout << "Enter integer" << endl;
 	int num;
 	cin >> num;
-	if(*(g_array->Find(num)) == num)
+	if(g_array->Find(num))
 	{
 		cout << "Found" << endl;
 	}
@@ -198,7 +198,7 @@ void IndexTest()
 	cout << "Enter integer" << endl;
 	int num;
 	cin >> num;
-	if(g_array->Index(num) != -1)
+	if(g_array->Find(num) && g_array->Index(num) != -1)
 	{
 		cout << "Index: " << g_array->Index(num) << endl;
 	}
